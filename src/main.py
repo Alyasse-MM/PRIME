@@ -1,0 +1,1 @@
+from registry import EXERCISE_REGISTRY
