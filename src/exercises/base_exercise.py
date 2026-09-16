@@ -1,12 +1,11 @@
 import random
 
-from question import Question
+from exercises.question import Question
 
 class BaseExercise:
     # Metadata
     id = "base"
-    title_fr = ""
-    title_en = ""
+    title = {"fr": "", "en": ""}
     tags = []
 
     def __init__(self, seed=None):

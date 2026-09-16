@@ -18,15 +18,11 @@ def render_grade_page(grade_title: str, registry: dict[str, list[type[BaseExerci
 
     st.title(f"{grade_title.capitalize()}")
     if len(registry) == 0:
-        if st.session_state.lang == "fr":
-            st.info("Pas encore implémenté")
-        else:
-            st.info("Not implemented yet")
+        info = {"fr": "Rien à voir pour l'instant.",
+                "en": "Nothing to see for now."}
+        st.info(info[st.session_state.lang])
     else:
         for chapter, exercises in registry.items():
             with st.expander(f"{chapter} ({len(exercises)} exercices)", expanded=False):
                 for exercise_class in exercises:
-                    if st.session_state.lang == "fr":
-                        st.write(exercise_class.lang_fr)
-                    else:
-                        st.write(exercise_class.lang_en)
+                    st.write(exercise_class.title[st.session_state.lang])
