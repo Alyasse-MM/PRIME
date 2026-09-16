@@ -1,13 +1,21 @@
+import random
+
+from exercises.question import Question
+
 class BaseExercise:
     # Metadata
     id = "base"
-    title_fr = ""
-    title_en = ""
-    level_fr = ""
-    level_en = ""
+    title = {"fr": "", "en": ""}
     tags = []
 
-    def __init__(self):
+    def __init__(self, seed=None):
+        if seed is None:
+            self.seed = random.randint(100000, 999999)
+        else:
+            self.seed = int(seed)
+
+        self.rng = random.Random(self.seed)
+        
         self.statement_fr = ""
         self.statement_en = ""
         self.questions = []
@@ -19,15 +27,16 @@ class BaseExercise:
 
     def get_data(self):
         return {
-            "meta": {
-                "id": self.id,
-                "title_fr": self.title_fr,
-                "title_en": self.title_en,
-                "level_fr": self.level_fr,
-                "level_en": self.level_en,
-                "tags": self.tags
+            "id": self.id,
+            "tags": self.tags,
+            "seed": self.seed,
+            "title": {
+                "fr": self.title_fr,
+                "en": self.title_en,
             },
-            "statement_fr": self.statement_fr,
-            "statement_en": self.statement_en,
-            "questions": self.questions
+            "statement": {
+                "fr": self.statement_fr,
+                "en": self.statement_en,
+            },
+            "questions": [q.get_data() for q in self.questions]
         }
