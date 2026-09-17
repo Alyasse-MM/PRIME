@@ -39,16 +39,12 @@ for folder_name, target_dict in grades.items():
             print(f"Erreur lors du chargement de {module_name}: {e}")
             continue
 
-        chap_fr = getattr(module, "CHAPTER_FR", "Autre")
-        chap_en = getattr(module, "CHAPTER_EN", "Other")
-
-        if chap_fr not in target_dict:
-            if st.session_state.lang == "fr":
-                target_dict[chap_fr] = []
-            else:
-                target_dict[chap_en] = []
+        chap_titles = getattr(module, "CHAPTER", {"fr": "Other", "en": "Other"})
+        chap = chap_titles["en"]
+        if chap not in target_dict:
+            target_dict[chap] = {"title": chap_titles, "exercises": []}
 
         for name, obj in inspect.getmembers(module, inspect.isclass):
             if issubclass(obj, BaseExercise) and obj is not BaseExercise:
                 if obj.__module__ == module_name:
-                    target_dict[chap_fr].append(obj)
+                    target_dict[chap]["exercises"].append(obj)

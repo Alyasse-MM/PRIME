@@ -30,10 +30,7 @@ class BaseExercise:
             "id": self.id,
             "tags": self.tags,
             "seed": self.seed,
-            "title": {
-                "fr": self.title_fr,
-                "en": self.title_en,
-            },
+            "title": self.title,
             "statement": {
                 "fr": self.statement_fr,
                 "en": self.statement_en,

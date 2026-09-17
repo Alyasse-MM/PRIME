@@ -11,8 +11,8 @@ badge_markdown = f"[![GitHub Repo](https://img.shields.io/badge/GitHub-Repositor
 
 st.sidebar.markdown(badge_markdown)
 
-toggle_label = "Switch to English" if st.session_state.lang == "fr" else "Passer en Français"
-if st.sidebar.button(toggle_label):
+toggle_label = {"en": "Switch to English", "fr": "Passer en Français"}
+if st.sidebar.button(toggle_label[st.session_state.lang]):
     st.session_state.lang = "en" if st.session_state.lang == "fr" else "fr"
     st.rerun()
 
