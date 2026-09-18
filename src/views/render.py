@@ -39,23 +39,17 @@ def render_grade_page(grade_titles: dict[str, str], registry: dict[str, list[typ
         st.caption(f"ID: {data['id']} | Seed: {data['seed']}")
         st.markdown(data["statement"][lang])
 
-        for q in data["questions"]:
+        for i, q in enumerate(data["questions"]):
             st.markdown(q[lang]["question"])
             
             ins_btn = {"en": "Show Insight",
                     "fr": "Voir l'indice"}
-            if st.button(ins_btn[lang], type="primary"):
-                st.session_state.show_insight = True
-                st.rerun()
-            if st.session_state.show_insight:
+            with st.expander(ins_btn[lang]):
                 st.info(q[lang]["insight"])
             
             sol_btn = {"en": "Show Solution",
                     "fr": "Voir la solution"}
-            if st.button(sol_btn[lang], type="primary"):
-                st.session_state.show_solution = True
-                st.rerun()
-            if st.session_state.show_solution:
+            with st.expander(sol_btn[lang]):
                 st.markdown(f"**{q[lang]['answer']}**")
 
 
