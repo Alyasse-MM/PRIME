@@ -16,8 +16,8 @@ class BaseExercise:
 
         self.rng = random.Random(self.seed)
         
-        self.statement_fr = ""
-        self.statement_en = ""
+        self.statement_fr = []
+        self.statement_en = []
         self.questions = []
         self.generate() 
 

@@ -2,6 +2,14 @@ import streamlit as st
 import matplotlib.figure as Figure
 from exercises.base_exercise import BaseExercise
 
+def render_content_block(items: list):
+    """Iterates through a list of mixed media and renders them appropriately."""
+    for item in items:
+        if isinstance(item, str):
+            st.markdown(f"**{item}**")
+        elif isinstance(item, Figure.Figure):
+            st.pyplot(item)
+
 def render_grade_page(grade_titles: dict[str, str], registry: dict[str, list[type[BaseExercise]]]):
     """
     Renders the page for a specific grade.
@@ -37,24 +45,21 @@ def render_grade_page(grade_titles: dict[str, str], registry: dict[str, list[typ
         
         st.subheader(data["title"][lang])
         st.caption(f"ID: {data['id']} | Seed: {data['seed']}")
-        st.markdown(data["statement"][lang])
+        render_content_block(data["statement"][lang])
 
         for i, q in enumerate(data["questions"]):
-            st.markdown(q[lang]["question"])
+            st.markdown(f"Question {i+1}")
+            render_content_block(q[lang]['question'])
             
             ins_btn = {"en": "Show Insight",
                     "fr": "Voir l'indice"}
             with st.expander(ins_btn[lang]):
-                st.info(q[lang]["insight"])
+                render_content_block(q[lang]['insight'])
             
             sol_btn = {"en": "Show Solution",
                     "fr": "Voir la solution"}
             with st.expander(sol_btn[lang]):
-                for item in q[lang]['answer']:
-                    if isinstance(item, str):
-                        st.markdown(f"**{item}**")
-                    elif isinstance(item, Figure.Figure):
-                        st.pyplot(item)
+                render_content_block(q[lang]['answer'])
 
 
 
