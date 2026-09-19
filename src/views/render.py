@@ -1,5 +1,5 @@
-from numpy import size
 import streamlit as st
+import matplotlib.figure as Figure
 from exercises.base_exercise import BaseExercise
 
 def render_grade_page(grade_titles: dict[str, str], registry: dict[str, list[type[BaseExercise]]]):
@@ -50,7 +50,11 @@ def render_grade_page(grade_titles: dict[str, str], registry: dict[str, list[typ
             sol_btn = {"en": "Show Solution",
                     "fr": "Voir la solution"}
             with st.expander(sol_btn[lang]):
-                st.markdown(f"**{q[lang]['answer']}**")
+                for item in q[lang]['answer']:
+                    if isinstance(item, str):
+                        st.markdown(f"**{item}**")
+                    elif isinstance(item, Figure.Figure):
+                        st.pyplot(item)
 
 
 

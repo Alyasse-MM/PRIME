@@ -1,5 +1,5 @@
 class Question:
-    def __init__(self, q_fr, q_en, insight_fr, insight_en, ans_fr, ans_en):
+    def __init__(self, q_fr, q_en, insight_fr, insight_en, ans_fr: list, ans_en: list):
         self.q_fr = q_fr
         self.q_en = q_en
         self.insight_fr = insight_fr
