@@ -6,7 +6,7 @@ def render_content_block(items: list):
     """Iterates through a list of mixed media and renders them appropriately."""
     for item in items:
         if isinstance(item, str):
-            st.markdown(f"**{item}**")
+            st.markdown (item)
         elif isinstance(item, Figure.Figure):
             st.pyplot(item)
 
