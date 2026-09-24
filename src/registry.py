@@ -5,6 +5,7 @@ import importlib
 import inspect
 from pathlib import Path
 import streamlit as st
+import inspect
 
 from exercises.base_exercise import BaseExercise
 
@@ -44,7 +45,7 @@ for folder_name, target_dict in grades.items():
         if chap not in target_dict:
             target_dict[chap] = {"title": chap_titles, "exercises": []}
 
-        for name, obj in inspect.getmembers(module, inspect.isclass):
-            if issubclass(obj, BaseExercise) and obj is not BaseExercise:
+        for obj in vars(module).values():
+            if inspect.isclass(obj) and issubclass(obj, BaseExercise) and obj is not BaseExercise:
                 if obj.__module__ == module_name:
                     target_dict[chap]["exercises"].append(obj)
