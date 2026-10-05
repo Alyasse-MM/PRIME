@@ -1,6 +1,7 @@
-from registry import EXERCISE_REGISTRY_TERMINALE
+from registry import registry
 from views.render import render_grade_page
 import streamlit as st
 
 title = {"fr": "terminale", "en": "12th grade"}
-render_grade_page(title, EXERCISE_REGISTRY_TERMINALE)
+path = "exercises/terminale"
+render_grade_page(title, registry(path))
