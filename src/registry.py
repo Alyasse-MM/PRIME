@@ -43,3 +43,17 @@ def registry(path: str) -> dict:
                 if obj.__module__ == module_name:
                     exercises_dict[chap]["exercises"].append(obj)
     return exercises_dict
+
+def registry(paths : list[str]) -> dict:
+    exercises_dict = {}
+    for path in paths:
+        grade_exercises = registry(path)
+        for chap_title, chap_data in grade_exercises.items():
+            if chap_title not in exercises_dict:
+                exercises_dict[chap_title] = chap_data
+            else:
+                chap_title = chap_title+" (Duplicate)"
+                chap_data["title"]["en"] = chap_data["title"]["en"] + " (Duplicate)"
+                chap_data["title"]["fr"] = chap_data["title"]["fr"] + " (Duplicata)"
+                exercises_dict[chap_title] = chap_data
+    return exercises_dict
