@@ -8,6 +8,16 @@ import streamlit as st
 from exercises.base_exercise import BaseExercise
 
 def registry(path: str) -> dict:
+    """
+    Imports all exercise classes from the specified directory and organizes them into a registry grouped by chapter.
+
+    Args:
+        path (str): The path to the directory containing exercise files.
+
+    Returns:
+        dict: A dictionary of exercises grouped by chapter.
+    """
+
     exercises_dict = {}
     exercises_path = Path(path)
 
@@ -45,6 +55,16 @@ def registry(path: str) -> dict:
     return exercises_dict
 
 def registry(paths : list[str]) -> dict:
+    """
+    Imports all exercise classes from the specified directories and organizes them into a registry grouped by chapter.
+
+    Args:
+        paths (list[str]): A list of paths to the directories containing exercise files.
+
+    Returns:
+        dict: A dictionary of exercises grouped by chapter.
+    """
+    
     exercises_dict = {}
     for path in paths:
         grade_exercises = registry(path)
