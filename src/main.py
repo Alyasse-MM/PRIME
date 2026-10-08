@@ -1,3 +1,3 @@
-import views.Controller as controller
+from views.Renderer import Renderer
 
-controller.Controller().render()
+Renderer().render()
