@@ -3,7 +3,7 @@ from exercises.base_exercise import BaseExercise
 from exercises.question import Question
 
 # Module-level registry key
-CHAPTER = {"fr": "Dérivation (Partie 2)", "en": "Differentiation (Part 2)"}
+MODULE = {"fr": "Dérivation (Partie 2)", "en": "Differentiation (Part 2)"}
 
 # ==========================================
 # MÉTHODE 1 : Dériver les fonctions usuelles

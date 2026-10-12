@@ -5,7 +5,7 @@ from exercises.base_exercise import BaseExercise
 from exercises.question import Question
 
 # Module-level registry key
-CHAPTER = {"fr": "Géométrie Repérée", "en": "Coordinate Geometry"}
+MODULE = {"fr": "Géométrie Repérée", "en": "Coordinate Geometry"}
 
 def format_sign(val):
     """Helper to format + and - signs cleanly."""

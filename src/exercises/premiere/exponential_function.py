@@ -5,7 +5,7 @@ from exercises.base_exercise import BaseExercise
 from exercises.question import Question
 
 # Module-level registry key
-CHAPTER = {"fr": "Fonction Exponentielle", "en": "Exponential Function"}
+MODULE = {"fr": "Fonction Exponentielle", "en": "Exponential Function"}
 
 # ==========================================
 # MÉTHODE 1 : Simplifier les écritures

@@ -6,7 +6,7 @@ from exercises.base_exercise import BaseExercise
 from exercises.question import Question
 
 # Module-level registry key
-CHAPTER = {"fr": "Polynômes du Second Degré (Partie 2)", "en": "Quadratic Polynomials (Part 2)"}
+MODULE = {"fr": "Polynômes du Second Degré (Partie 2)", "en": "Quadratic Polynomials (Part 2)"}
 
 # ==========================================
 # MÉTHODE 1 : Résoudre une équation du second degré

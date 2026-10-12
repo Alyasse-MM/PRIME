@@ -6,7 +6,7 @@ from exercises.base_exercise import BaseExercise
 from exercises.question import Question
 
 # Module-level registry key
-CHAPTER = {"fr": "Suites Arithmétiques et Géométriques", "en": "Arithmetic and Geometric Sequences"}
+MODULE = {"fr": "Suites Arithmétiques et Géométriques", "en": "Arithmetic and Geometric Sequences"}
 
 # ==========================================
 # MÉTHODE 1 : Démontrer qu'une suite est arithmétique

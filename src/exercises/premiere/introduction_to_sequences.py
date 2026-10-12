@@ -6,7 +6,7 @@ from exercises.base_exercise import BaseExercise
 from exercises.question import Question
 
 # Module-level registry key
-CHAPTER = {"fr": "Généralités sur les Suites", "en": "Introduction to Sequences"}
+MODULE = {"fr": "Généralités sur les Suites", "en": "Introduction to Sequences"}
 
 
 # ==========================================

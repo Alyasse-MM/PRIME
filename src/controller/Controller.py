@@ -1,14 +1,15 @@
 from enum import Enum, auto
+from pathlib import Path
 
 import streamlit as st
 
-from registry import get_exercises_from_folder
+from model.StudyPlan import StudyPlan
 from exercises.base_exercise import BaseExercise
 
 class State(Enum):
     HOME = auto()
-    GRADE = auto()
-    CHAPTER = auto()
+    STUDYPLAN = auto()
+    MODULE = auto()
     EXERCISE = auto()
 
 class Controller:
@@ -19,12 +20,15 @@ class Controller:
         
         if "app_state" not in st.session_state:
             st.session_state.app_state = State.HOME
+
+        if "current_studyplan" not in st.session_state:
+            st.session_state.current_studyplan = None
+        
+        if "current_studyplan_metadata" not in st.session_state:
+            st.session_state.current_studyplan_metadata = self.get_homepage_metadata()
             
-        if "current_grade_key" not in st.session_state:
-            st.session_state.current_grade_key = "accueil"
-            
-        if "current_chapter" not in st.session_state:
-            st.session_state.current_chapter = None
+        if "current_module" not in st.session_state:
+            st.session_state.current_module = None
             
         if "current_exercise" not in st.session_state:
             st.session_state.current_exercise = None
@@ -32,6 +36,19 @@ class Controller:
         if "cached_exercises_list" not in st.session_state:
             st.session_state.cached_exercises_list = None
 
+    def get_homepage_metadata(self) -> dict[str,dict[str,str]]:
+        result = StudyPlan.get_homepage_metadata()
+        return result
+
+    def get_current_studyplan_key(self) -> str:
+        return st.session_state.current_studyplan_metadata["key"]
+    
+    def get_current_studyplan_names(self) -> dict[str,str]:
+        return st.session_state.current_studyplan_metadata["names"]
+    
+    def get_current_studyplan_description(self) -> dict[str,str]:
+        return st.session_state.current_studyplan_metadata["descriptions"]
+    
     def get_current_language(self) -> str:
         """
         Returns:
@@ -59,35 +76,35 @@ class Controller:
             new_state (State): The new app state."""
         st.session_state.app_state = new_state
 
-    def get_current_grade_key(self) -> str:
+    def get_current_studyplan_metadata(self) -> dict[str,dict,dict]:
         """
         Returns:
-            str: The name of the currently selected chapter or `accueil`
+            dict[srt,dict,dict]: The key, names, and description of the currently selected module`
         """
-        return st.session_state.current_grade_key
-    def set_current_grade_key(self, new_grade_key: str):
+        return st.session_state.current_studyplan_metadata
+    def set_current_studyplan_metadata(self, new_metadata: dict[str,dict,dict]):
         """
-        Changes the current grade
+        Changes the current studyplan's metadata
         
         Args:
-            new_grade_key (str): The name of the new selected grade.
+            new_metadata (dict[str,dict,dict]): The key, names, and descriptions of the new selected module.
         """
-        st.session_state.curreng_grade_key = new_grade_key
+        st.session_state.current_studyplan_metadata = new_metadata
     
-    def get_current_chapter(self) -> str:
+    def get_current_module(self) -> str:
         """
         Returns:
-            str: The name of the currently selected chapter.
+            str: The name of the currently selected module.
         """
-        return st.session_state.current_chapter
-    def set_current_chapter(self, new_chapter: str):
+        return st.session_state.current_module
+    def set_current_module(self, new_module: str):
         """
-        Changes the current chapter
+        Changes the current module
         
         Args:
-            new_chapter (str): The name of the new selected chapter.
+            new_module (str): The name of the new selected module.
         """
-        st.session_state.current_chapter = new_chapter
+        st.session_state.current_module = new_module
     
     def get_current_exercise(self) -> BaseExercise:
         """
@@ -106,27 +123,40 @@ class Controller:
     def get_cached_exercises_list(self) -> dict:
         """
         Returns:
-            dict: the currently selected grade's dictionary of exercises grouped by chapter.
+            dict: the currently selected studyplan's dictionary of exercises grouped by module.
         """
         return st.session_state.cached_exercises_list if st.session_state.cached_exercises_list else None
 
-    def switch_page_context(self, grade_key: str):
+    def switch_page_context(self, module_metadata: dict[str, str, str]):
         """
-        Sets the current grade key to `grade_key` and both `current_chapter` and `current_exercise` to None.  
-        If `grade_key == accueil`, then `st.session_state.app_state` is set to `State.HOME` and `cached_exercises_list` is set to `None`  
-        Otherwise, `st.session_state.app_state` is set to `State.GRADE` and the selected grade's exercises list is loaded in `cached_exercises_list`.
+        Sets the current studyplan state parameters and resets navigation paths.
         
         Args:
-            grade_key (str): The name of the newly selected grade.
+            module_metadata (dict[str, str, str]): The key, names, and descriptions of the newly selected module.
         """
-        if st.session_state.current_grade_key != grade_key:
-            st.session_state.current_grade_key = grade_key
-            st.session_state.current_chapter = None
+        if st.session_state.current_studyplan_metadata != module_metadata:
+            st.session_state.current_studyplan_metadata = module_metadata
+            st.session_state.current_module = None
             st.session_state.current_exercise = None
 
-            if grade_key == "accueil":
+            if module_metadata["key"] == "accueil":
                 st.session_state.app_state = State.HOME
+                st.session_state.current_studyplan = None
+                self.set_current_studyplan_metadata(self.get_homepage_metadata())
                 st.session_state.cached_exercises_list = None
             else:
-                st.session_state.app_state = State.GRADE
-                st.session_state.cached_exercises_list = get_exercises_from_folder(f"exercises/{grade_key}")
+                st.session_state.app_state = State.STUDYPLAN
+                st.session_state.current_studyplan = StudyPlan.create(f"../exercises/{module_metadata["key"]}")
+                checked_path=st.session_state.current_studyplan.get_path()
+                self.set_current_studyplan_metadata(module_metadata)
+                st.session_state.cached_exercises_list = StudyPlan.get_exercises_from_folder(checked_path)
+
+    def get_modules_list(self) -> list[dict[str,str,str]]:
+        study_plans = []
+        default_module_repertory = StudyPlan.get_checked_path(Path("../exercises"))
+        for entry in default_module_repertory.rglob("**"):
+            if entry.is_dir():
+                module_key, module_names, module_descriptions = StudyPlan.get_metadata(entry)
+                if module_key is not None and module_names is not None:
+                    study_plans.append({"key":module_key, "names":module_names, "descriptions":module_descriptions})
+        return study_plans

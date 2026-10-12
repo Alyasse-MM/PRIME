@@ -5,7 +5,7 @@ from exercises.base_exercise import BaseExercise
 from exercises.question import Question
 
 # Module-level registry key
-CHAPTER = {"fr": "Produit Scalaire (Partie 2)", "en": "Dot Product (Part 2)"}
+MODULE = {"fr": "Produit Scalaire (Partie 2)", "en": "Dot Product (Part 2)"}
 
 # ==========================================
 # MÉTHODE 1 : Calculer un produit scalaire par projection

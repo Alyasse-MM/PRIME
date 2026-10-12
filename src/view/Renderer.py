@@ -10,17 +10,11 @@ class Renderer:
     def __init__(self):
         self.controller = Controller()
 
-        self.page_titles = {
-            "accueil" : {"fr" : "Accueil", "en" : "Home"},
-            "seconde" : {"fr" : "Seconde", "en" : "10th Grade"},
-            "premiere" : {"fr" : "Première", "en" : "11th Grade"},
-            "terminale" : {"fr" : "Terminale", "en" : "12th Grade"}
-        }
         self.lang=self.controller.get_current_language()
 
     def render_language_switch(self):
         """
-        Renderes the switch language button.
+        Renders the switch language button.
         """
         # The label is in the targeted language
         toggle_label = {"en": "Passer en Français", "fr": "Switch to English"}
@@ -30,7 +24,7 @@ class Renderer:
 
     def render_sidebar(self):
         """
-        Renderes the sidebar
+        Renders the sidebar
         """
         st.sidebar.title("PRIME")
         st.sidebar.markdown("*(Python Randomized Interactive Math Exercises)*")
@@ -41,13 +35,13 @@ class Renderer:
 
         self.render_language_switch()
         st.sidebar.divider()
-        
-        page_home = st.Page(partial(self.controller.switch_page_context, "accueil"), title=self.page_titles["accueil"][self.lang], url_path="accueil")
-        page_prem = st.Page(partial(self.controller.switch_page_context, "premiere"), title=self.page_titles["premiere"][self.lang], url_path="premiere")
-        page_sec  = st.Page(partial(self.controller.switch_page_context, "seconde"), title=self.page_titles["seconde"][self.lang], url_path="seconde")
-        page_term = st.Page(partial(self.controller.switch_page_context, "terminale"), title=self.page_titles["terminale"][self.lang], url_path="terminale")
 
-        pg = st.navigation([page_home, page_sec, page_prem, page_term], position="sidebar")
+        modules = [self.controller.get_homepage_metadata()]
+        modules.extend(self.controller.get_modules_list())
+        pages=[]
+        for module in modules:
+            pages.append(st.Page(partial(self.controller.switch_page_context, module), title=module["names"][self.lang], url_path=module["key"]))
+        pg = st.navigation(pages, position="sidebar")
         pg.run()
 
     def render_main(self):
@@ -74,17 +68,16 @@ class Renderer:
         """
         ex = self.controller.get_current_exercise()
         if not ex:
-            self.controller.set_app_state(State.CHAPTER)
+            self.controller.set_app_state(State.MODULE)
             st.rerun()
 
-        grade_key = self.controller.get_current_grade_key()
-        st.header(self.page_titles[grade_key][self.lang].capitalize())
+        st.header(self.controller.get_current_studyplan_names()[self.lang].capitalize())
         st.title(f"{ex.title[self.lang]}")
         
         back_label = {"en": "⬅ Back to exercises", "fr": "⬅ Retour aux exercices"}
         if st.button(back_label[self.lang]):
             self.controller.set_current_exercise(None)
-            self.controller.set_app_state(State.CHAPTER)
+            self.controller.set_app_state(State.MODULE)
             st.rerun()
 
         st.divider()
@@ -106,28 +99,27 @@ class Renderer:
 
     def render_exercise_selection(self):
         """
-        Renderers the exercise selection page, using data from currently selected chapter.
+        Renderers the exercise selection page, using data from currently selected module.
         """
-        chapter_key = self.controller.get_current_chapter()
-        chapter_data = self.controller.get_cached_exercises_list().get(chapter_key)
+        module_key = self.controller.get_current_module()
+        module_data = self.controller.get_cached_exercises_list().get(module_key)
 
-        if not chapter_data:
-            self.controller.set_app_state(State.GRADE)
+        if not module_data:
+            self.controller.set_app_state(State.STUDYPLAN)
             st.rerun()
 
-        grade_key = self.controller.get_current_grade_key()
-        st.header(self.page_titles[grade_key][self.lang].capitalize())
-        st.title(chapter_data["title"][self.lang])
+        st.header(self.controller.get_current_studyplan_names()[self.lang].capitalize())
+        st.title(module_data["title"][self.lang])
         
-        back_label = {"en": "⬅ Back to chapters", "fr": "⬅ Retour aux chapitres"}
+        back_label = {"en": "⬅ Back to modules", "fr": "⬅ Retour aux modules"}
         if st.button(back_label[self.lang]):
-            self.controller.set_current_chapter(None)
-            self.controller.set_app_state(State.GRADE)
+            self.controller.set_current_module(None)
+            self.controller.set_app_state(State.STUDYPLAN)
             st.rerun()
 
         st.divider()
 
-        for ExerciseClass in chapter_data["exercises"]:
+        for ExerciseClass in module_data["exercises"]:
             col1, col2 = st.columns([0.8, 0.2], vertical_alignment="center")
             with col1:
                 st.write(f"**{ExerciseClass.title[self.lang]}**")
@@ -138,13 +130,11 @@ class Renderer:
                     self.controller.set_app_state(State.EXERCISE)
                     st.rerun()
 
-    def render_chapter_selection(self):
+    def render_module_selection(self):
         """
-        Renders the chapter selection page, using data from the currently selected grade.
+        Renders the module selection page, using data from the currently selected studyplan.
         """
-
-        grade_key = self.controller.get_current_grade_key()
-        display_title = self.page_titles[grade_key][self.lang].capitalize()
+        display_title = self.controller.get_current_studyplan_names()[self.lang].capitalize()
         
         st.set_page_config(page_title=f"PRIME - {display_title}", layout="centered")
         st.title(display_title)
@@ -156,21 +146,21 @@ class Renderer:
             st.info(msg[self.lang])
             return
 
-        menu_title = {"en": "Select a chapter:", "fr": "Sélectionnez un chapitre :"}
+        menu_title = {"en": "Select a module:", "fr": "Sélectionnez un module :"}
         st.markdown(f"### {menu_title[self.lang]}")
 
-        for chapter_key, chapter_data in exercises_list.items():
-            chapter_title = chapter_data["title"][self.lang]
-            count = len(chapter_data["exercises"])
+        for module_key, module_data in exercises_list.items():
+            module_title = module_data["title"][self.lang]
+            count = len(module_data["exercises"])
             
             col1, col2 = st.columns([0.8, 0.2], vertical_alignment="center")
             with col1:
-                st.markdown(f"**{chapter_title} ({count})**")
+                st.markdown(f"**{module_title} ({count})**")
             with col2:
                 button_label = {"en": "Access", "fr": "Accéder"}
-                if st.button(button_label[self.lang], key=f"chap_btn_{chapter_key}", use_container_width=True):
-                    self.controller.set_current_chapter(chapter_key)
-                    self.controller.set_app_state(State.CHAPTER)
+                if st.button(button_label[self.lang], key=f"module_btn_{module_key}", use_container_width=True):
+                    self.controller.set_current_module(module_key)
+                    self.controller.set_app_state(State.MODULE)
                     st.rerun()
 
     def render(self):
@@ -185,7 +175,7 @@ class Renderer:
             self.render_main()
         elif current_view == State.EXERCISE:
             self.render_exercise()
-        elif current_view == State.CHAPTER:
+        elif current_view == State.MODULE:
             self.render_exercise_selection()
-        elif current_view == State.GRADE:
-            self.render_chapter_selection()
+        elif current_view == State.STUDYPLAN:
+            self.render_module_selection()

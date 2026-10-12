@@ -5,7 +5,7 @@ from exercises.base_exercise import BaseExercise
 from exercises.question import Question
 
 # Module-level registry key
-CHAPTER = {"fr": "Variables Aléatoires", "en": "Random Variables"}
+MODULE = {"fr": "Variables Aléatoires", "en": "Random Variables"}
 
 # ==========================================
 # MÉTHODE 1 : Calculer une probabilité

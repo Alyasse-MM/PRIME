@@ -1,3 +1,3 @@
-from views.Renderer import Renderer
+from view.Renderer import Renderer
 
 Renderer().render()

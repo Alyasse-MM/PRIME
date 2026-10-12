@@ -1,0 +1,5 @@
+{
+    "key": "unique_key",
+    "name": {"fr": "Programme", "en": "Study plan"},
+    "description": {"fr": "Un assortiment d'exercises", "en": "A set of exercises"}
+}

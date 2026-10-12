@@ -6,7 +6,7 @@ from exercises.base_exercise import BaseExercise
 from exercises.question import Question
 
 # Module-level registry key
-CHAPTER = {"fr": "Dérivation (Partie 1)", "en": "Differentiation (Part 1)"}
+MODULE = {"fr": "Dérivation (Partie 1)", "en": "Differentiation (Part 1)"}
 
 # ==========================================
 # MÉTHODE 1 : Démontrer qu'une fonction est dérivable

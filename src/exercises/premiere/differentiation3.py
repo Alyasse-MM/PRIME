@@ -6,7 +6,7 @@ from exercises.base_exercise import BaseExercise
 from exercises.question import Question
 
 # Module-level registry key
-CHAPTER = {"fr": "Dérivation (Partie 3)", "en": "Differentiation (Part 3)"}
+MODULE = {"fr": "Dérivation (Partie 3)", "en": "Differentiation (Part 3)"}
 
 # ==========================================
 # MÉTHODE 1 : Lien entre signe de dérivée et variations

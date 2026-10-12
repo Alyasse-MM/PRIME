@@ -5,7 +5,7 @@ from exercises.base_exercise import BaseExercise
 from exercises.question import Question
 
 # Module-level registry key
-CHAPTER = {"fr": "Probabilités Conditionnelles", "en": "Conditional Probability"}
+MODULE = {"fr": "Probabilités Conditionnelles", "en": "Conditional Probability"}
 
 def _draw_2_level_tree(p_A, p_notA, p_B_A, p_notB_A, p_B_notA, p_notB_notA, label_A="A", label_B="B"):
     """Génère un arbre pondéré à 2 niveaux avec Matplotlib."""
