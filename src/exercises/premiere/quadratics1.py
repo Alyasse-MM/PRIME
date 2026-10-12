@@ -5,7 +5,7 @@ from exercises.base_exercise import BaseExercise
 from exercises.question import Question
 
 # Module-level registry key
-CHAPTER = {"fr": "Polynômes du Second Degré Partie 1", "en": "Quadratic Polynomials Part 1"}
+MODULE = {"fr": "Polynômes du Second Degré Partie 1", "en": "Quadratic Polynomials Part 1"}
 
 def _build_canonical_latex(a, alpha, beta):
     """Helper function to build the canonical string without SymPy auto-expanding it."""

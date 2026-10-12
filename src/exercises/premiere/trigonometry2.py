@@ -6,7 +6,7 @@ from exercises.base_exercise import BaseExercise
 from exercises.question import Question
 
 # Module-level registry key
-CHAPTER = {"fr": "Trigonométrie (Partie 2)", "en": "Trigonometry (Part 2)"}
+MODULE = {"fr": "Trigonométrie (Partie 2)", "en": "Trigonometry (Part 2)"}
 
 def _draw_trigo_circle(ax, points=None, show_references=False, proj_cos=False, proj_sin=False):
     """

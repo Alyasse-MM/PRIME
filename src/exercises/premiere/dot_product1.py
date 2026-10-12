@@ -5,7 +5,7 @@ from exercises.base_exercise import BaseExercise
 from exercises.question import Question
 
 # Module-level registry key
-CHAPTER = {"fr": "Produit Scalaire (Partie 1)", "en": "Dot Product (Part 1)"}
+MODULE = {"fr": "Produit Scalaire (Partie 1)", "en": "Dot Product (Part 1)"}
 
 # ==========================================
 # MÉTHODE 1 : Calculer avec la formule du cosinus
