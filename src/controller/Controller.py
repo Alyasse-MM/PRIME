@@ -29,6 +29,9 @@ class Controller:
             
         if "current_module" not in st.session_state:
             st.session_state.current_module = None
+
+        if "current_module_is_shuffled" not in st.session_state:
+            st.session_state.current_module_is_shuffled = False
             
         if "current_exercise" not in st.session_state:
             st.session_state.current_exercise = None
@@ -120,6 +123,16 @@ class Controller:
         """
         st.session_state.current_exercise = new_exercise
 
+    def get_current_module_is_shuffled(self):
+        return st.session_state.current_module_is_shuffled
+    def set_current_module_is_shuffled(self):
+        if st.session_state.current_module_is_shuffled:
+            st.session_state.current_module_is_shuffled = False
+            st.session_state.cached_exercises_list = st.session_state.current_studyplan.get_data()
+        else:
+            st.session_state.current_module_is_shuffled = True
+            st.session_state.cached_exercises_list = st.session_state.current_studyplan.get_randomized_data()
+
     def get_cached_exercises_list(self) -> dict:
         """
         Returns:
@@ -144,11 +157,13 @@ class Controller:
                 st.session_state.current_studyplan = None
                 self.set_current_studyplan_metadata(self.get_homepage_metadata())
                 st.session_state.cached_exercises_list = None
+                st.session_state.current_module_is_shuffled = False
             else:
                 st.session_state.app_state = State.STUDYPLAN
                 st.session_state.current_studyplan = StudyPlan.create(f"../exercises/{module_metadata["key"]}")
                 self.set_current_studyplan_metadata(module_metadata)
                 st.session_state.cached_exercises_list = st.session_state.current_studyplan.get_data()
+                st.session_state.current_module_is_shuffled = False
 
     def get_modules_list(self) -> list[dict[str,str,str]]:
         study_plans = []
