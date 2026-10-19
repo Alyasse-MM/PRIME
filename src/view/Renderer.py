@@ -147,7 +147,19 @@ class Renderer:
             return
 
         menu_title = {"en": "Select a module:", "fr": "Sélectionnez un module :"}
-        st.markdown(f"### {menu_title[self.lang]}")
+        col1, col2 = st.columns([0.8, 0.2], vertical_alignment="center")
+        with col1:
+            st.markdown(f"### {menu_title[self.lang]}")
+        with col2:
+            if self.controller.get_current_module_is_shuffled():
+                button_label = {"en": "Sort", "fr": "Trier"}
+            else:
+                button_label = {"en": "Shuffle", "fr": "Mélanger"}
+            if st.button(button_label[self.lang], key=f"module_btn_switch_shuffle_state", use_container_width=True):
+                self.controller.set_current_module_is_shuffled()
+                st.rerun()
+
+
 
         for module_key, module_data in exercises_list.items():
             module_title = module_data["title"][self.lang]

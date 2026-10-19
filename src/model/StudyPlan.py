@@ -1,6 +1,7 @@
 import json
 import importlib
 import inspect
+import random
 from pathlib import Path
 
 import streamlit as st
@@ -160,24 +161,37 @@ class StudyPlan:
                 exercises_dict[new_module_title] = new_module_data
         return exercises_dict
 
+    @st.cache_resource
     @staticmethod
-    def to_list(exercises_dict: dict) -> list:
+    def randomize_order(exercises_dict: dict, part_size=15) -> dict:
         """
-        Convert the exercises dictionary to a list of tuples "exercise_class, module_title".
+        Randomizes the order of exercises in `exercises_dict` in a new dictionary. 
 
         Args:
             exercises_dict (dict): A dictionary of exercises grouped by module.
+            part_size (int): Maximum number of items per part.
 
         Returns:
-            data (list): A list of tuples (exercise_class, module_title).
+            data (dict): A dictionnary of `exercise_class` divided in
+            `n` parts of size `part_size` maximum.
         """
         exercises_list = []
-        for module_title, module_data in exercises_dict.items():
+        for module_data in exercises_dict.values():
             for exercise_class in module_data["exercises"]:
-                exercises_list.append((exercise_class, module_title))
-
+                exercises_list.append((exercise_class))
                 
-        return exercises_list
+        random.shuffle(exercises_list)
+        
+        randomized_dict = {}
+        
+        for i in range(0, len(exercises_list), part_size):
+            part_index = (i // part_size) + 1
+            titles={"en":f"Part {part_index}","fr":f"Partie {part_index}"}
+            randomized_dict[f"Part {part_index}"] = {}
+            randomized_dict[f"Part {part_index}"]["title"] = titles
+            randomized_dict[f"Part {part_index}"]["exercises"] = exercises_list[i : i + part_size]
+            
+        return randomized_dict
 
     def get_paths(self) -> Path:
         return self.paths
@@ -190,3 +204,6 @@ class StudyPlan:
 
     def get_data(self) -> dict:
         return self.data
+
+    def get_randomized_data(self) -> dict:
+        return StudyPlan.randomize_order(self.data)
