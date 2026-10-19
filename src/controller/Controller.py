@@ -3,7 +3,7 @@ from pathlib import Path
 
 import streamlit as st
 
-from model.StudyPlan import StudyPlan
+from model.StudyPlan import *
 from exercises.base_exercise import BaseExercise
 
 class State(Enum):
@@ -147,16 +147,15 @@ class Controller:
             else:
                 st.session_state.app_state = State.STUDYPLAN
                 st.session_state.current_studyplan = StudyPlan.create(f"../exercises/{module_metadata["key"]}")
-                checked_path=st.session_state.current_studyplan.get_path()
                 self.set_current_studyplan_metadata(module_metadata)
-                st.session_state.cached_exercises_list = StudyPlan.get_exercises_from_folder(checked_path)
+                st.session_state.cached_exercises_list = st.session_state.current_studyplan.get_data()
 
     def get_modules_list(self) -> list[dict[str,str,str]]:
         study_plans = []
-        default_module_repertory = StudyPlan.get_checked_path(Path("../exercises"))
+        default_module_repertory = StudyPlan.get_checked_path(DEFAULT_STUDYPLAN_DIR)
         for entry in default_module_repertory.rglob("**"):
             if entry.is_dir():
-                module_key, module_names, module_descriptions = StudyPlan.get_metadata(entry)
+                module_key, module_names, module_descriptions, _ = StudyPlan.get_metadata(entry)
                 if module_key is not None and module_names is not None:
                     study_plans.append({"key":module_key, "names":module_names, "descriptions":module_descriptions})
         return study_plans

@@ -7,13 +7,18 @@ import streamlit as st
 
 from exercises.base_exercise import BaseExercise
 
+DEFAULT_STUDYPLAN_DIR = Path("../exercises")
+
 class StudyPlan:
-    def __init__(self, path: Path, key: str, names: dict, descriptions: dict):
-        self.path = path
+    def __init__(self, paths, key: str, names: dict, descriptions: dict):
+        self.paths = paths
         self.key = key
         self.names = names
         self.descriptions = descriptions
-        self.data = StudyPlan.get_exercises_from_folder(path)
+        if isinstance(paths, list):
+            self.data = StudyPlan.get_exercises_from_folders(paths)
+        else:
+            self.data = StudyPlan.get_exercises_from_folder(paths)
 
     @st.cache_data
     @staticmethod
@@ -36,10 +41,15 @@ class StudyPlan:
 
     @st.cache_data
     @staticmethod
-    def get_metadata(module_path : Path) -> tuple[str, dict, dict] | tuple[None, None, None]:
+    def get_metadata(module_path : Path) -> tuple[str, dict, dict, None] | tuple[str, dict, dict, list] | tuple[None, None, None, None]:
         """
         Load a study plan's metadata from a json file in `module_path`.
-        Returns (name, description) or (None, None) if the file doesn't exist or is malformed.
+        Args:
+            module_path (Path): a path to a module's repository
+        Returns:
+            metadata (tuple(key, name, description, None)): if the given module is a standard one.
+            metadada (tuple(key, name, description, includes)): if the given module is a dynamic one.
+            metadata (tuple(None, None, None, None)): if an error was encountered while reading metadata.
         """
 
         json_path = module_path / "metadata.json"
@@ -50,12 +60,13 @@ class StudyPlan:
             if not isinstance(json_data, dict):
                 json_data = {}
         except (FileNotFoundError, json.JSONDecodeError):
-            return None, None, None
+            return None, None, None, None
 
         key = json_data.get("key", str(module_path))
         name = json_data.get("name", {"fr": "Programme", "en": "Study plan"})
         description = json_data.get("description", {"fr": "Un assortiment d'exercises", "en": "A set of exercises"})
-        return key, name, description
+        includes = json_data.get("includes", [])
+        return key, name, description, includes
 
     @st.cache_data
     @staticmethod
@@ -72,11 +83,16 @@ class StudyPlan:
         if checked_path is None:
             return None
 
-        key, names, descriptions = cls.get_metadata(checked_path)
-        if (key, names,descriptions)==(None, None,None):
+        key, names, descriptions, paths = cls.get_metadata(checked_path)
+        if (key, names,descriptions, paths)==(None, None, None, None):
             return None
-            
-        return cls(checked_path, key, names, descriptions)
+        if (len(paths)>0):
+            checked_paths=[]
+            for element in paths:
+                checked_paths.append(cls.get_checked_path(DEFAULT_STUDYPLAN_DIR / element))
+            return cls(checked_paths, key, names, descriptions)
+        else:
+            return cls(checked_path, key, names, descriptions)
 
     @st.cache_resource
     @staticmethod
@@ -88,7 +104,7 @@ class StudyPlan:
             path (str): The path to the directory containing exercise files.
 
         Returns:
-            dict: A dictionary of exercises grouped by module.
+            data (dict): A dictionary of exercises grouped by module.
         """
 
         exercises_dict = {}
@@ -118,29 +134,28 @@ class StudyPlan:
                         exercises_dict[module_key]["exercises"].append(obj)
         return exercises_dict
 
+    @st.cache_resource
     @staticmethod
-    def get_exercises_from_folders(paths : list[str]) -> dict:
+    def get_exercises_from_folders(paths : list[Path]) -> dict:
         """
         Imports all exercise classes from the specified directories and organizes them into a registry grouped by module.
 
         Args:
-            paths (list[str]): A list of paths to the directories containing exercise files.
+            paths (list[Path]): A list of paths to the directories containing the included study plans.
 
         Returns:
-            dict: A dictionary of exercises grouped by module.
+            data (dict): A dictionary of exercises grouped by module.
         """
 
         exercises_dict = {}
         for path in paths:
+            studyplan_key,studyplan_names,_,_ = StudyPlan.get_metadata(path)
             studyplan_exercises = StudyPlan.get_exercises_from_folder(path)
             for module_title, module_data in studyplan_exercises.items():
-                if module_title not in exercises_dict:
-                    exercises_dict[module_title] = module_data
-                else:
-                    module_title = module_title+" (Duplicate)"
-                    module_data["title"]["en"] = module_data["title"]["en"] + " (Duplicate)"
-                    module_data["title"]["fr"] = module_data["title"]["fr"] + " (Duplicata)"
-                    exercises_dict[module_title] = module_data
+                module_title = module_title+" ("+studyplan_key+")"
+                module_data["title"]["en"] = module_data["title"]["en"] + " ("+studyplan_names["en"]+")"
+                module_data["title"]["fr"] = module_data["title"]["fr"] + " ("+studyplan_names["fr"]+")"
+                exercises_dict[module_title] = module_data
         return exercises_dict
 
     @staticmethod
@@ -152,7 +167,7 @@ class StudyPlan:
             exercises_dict (dict): A dictionary of exercises grouped by module.
 
         Returns:
-            list: A list of tuples (exercise_class, module_title).
+            data (list): A list of tuples (exercise_class, module_title).
         """
         exercises_list = []
         for module_title, module_data in exercises_dict.items():
@@ -162,8 +177,8 @@ class StudyPlan:
                 
         return exercises_list
 
-    def get_path(self) -> Path:
-        return self.path
+    def get_paths(self) -> Path:
+        return self.paths
 
     def get_names(self) -> dict:
         return self.names

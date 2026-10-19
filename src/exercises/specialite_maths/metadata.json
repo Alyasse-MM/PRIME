@@ -1,0 +1,6 @@
+{
+    "key": "specialite_maths",
+    "name": {"fr": "Spécialité mathématiques", "en": "Speciality mathematics"},
+    "description": {"fr": "Intégralité du programme de spécialité mathématique", "en": "The entire french speciality mathematics curriculum"},
+    "includes": ["seconde","premiere","terminale"]
+}
