@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from exercises.base_exercise import BaseExercise
 from exercises.question import Question
+from scipy.interpolate import CubicSpline
 
 # Module-level registry key
 MODULE = {"fr": "Dérivation (Partie 3)", "en": "Differentiation (Part 3)"}
@@ -385,7 +386,6 @@ class TraceFromTable(BaseExercise):
         # 3. Génération du graphique solution
         fig, ax = plt.subplots(figsize=(7, 5))
         
-        from scipy.interpolate import CubicSpline
         xs = np.array([x1, x2, x3, x4])
         ys = np.array([y1, y2, y3, y4])
         
