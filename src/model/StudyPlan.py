@@ -152,10 +152,12 @@ class StudyPlan:
             studyplan_key,studyplan_names,_,_ = StudyPlan.get_metadata(path)
             studyplan_exercises = StudyPlan.get_exercises_from_folder(path)
             for module_title, module_data in studyplan_exercises.items():
-                module_title = module_title+" ("+studyplan_key+")"
-                module_data["title"]["en"] = module_data["title"]["en"] + " ("+studyplan_names["en"]+")"
-                module_data["title"]["fr"] = module_data["title"]["fr"] + " ("+studyplan_names["fr"]+")"
-                exercises_dict[module_title] = module_data
+                new_module_title = module_title+" ("+studyplan_key+")"
+                new_module_data = module_data.copy()
+                new_module_data["title"] = module_data["title"].copy()
+                new_module_data["title"]["en"] = new_module_data["title"]["en"] + " (" + studyplan_names["en"] + ")"
+                new_module_data["title"]["fr"] = new_module_data["title"]["fr"] + " (" + studyplan_names["fr"] + ")"
+                exercises_dict[new_module_title] = new_module_data
         return exercises_dict
 
     @staticmethod
