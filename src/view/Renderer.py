@@ -36,11 +36,11 @@ class Renderer:
         self.render_language_switch()
         st.sidebar.divider()
 
-        modules = [self.controller.get_homepage_metadata()]
-        modules.extend(self.controller.get_modules_list())
+        studyplans = [self.controller.get_homepage_metadata()]
+        studyplans.extend(self.controller.get_studyplan_list())
         pages=[]
-        for module in modules:
-            pages.append(st.Page(partial(self.controller.switch_page_context, module), title=module["names"][self.lang], url_path=module["key"]))
+        for studyplan in studyplans:
+            pages.append(st.Page(partial(self.controller.switch_page_context, studyplan), title=studyplan["names"][self.lang], url_path=studyplan["key"]))
         pg = st.navigation(pages, position="sidebar")
         pg.run()
 
@@ -102,7 +102,7 @@ class Renderer:
         Renderers the exercise selection page, using data from currently selected module.
         """
         module_key = self.controller.get_current_module()
-        module_data = self.controller.get_cached_exercises_list().get(module_key)
+        module_data = self.controller.get_exercises_list().get(module_key)
 
         if not module_data:
             self.controller.set_app_state(State.STUDYPLAN)
@@ -134,32 +134,49 @@ class Renderer:
         """
         Renders the module selection page, using data from the currently selected studyplan.
         """
+        if "shuffled" not in st.query_params:
+            st.query_params["shuffled"] = str(False).lower()
+        seed = self.controller.get_current_seed()
+        shuffled = self.controller.get_studyplan_shuffle_state()
+        if (not shuffled and seed is not None) or ("seed" in st.query_params and seed is None):
+            self.controller.del_current_seed()
+            st.rerun()
+        elif shuffled and seed is None:
+            self.controller.set_studyplan_shuffle_state(False)
+            st.rerun()
+
         display_title = self.controller.get_current_studyplan_names()[self.lang].capitalize()
-        
         st.set_page_config(page_title=f"PRIME - {display_title}", layout="centered")
         st.title(display_title)
 
-        exercises_list = self.controller.get_cached_exercises_list()
-        
+        exercises_list = self.controller.get_exercises_list()
         if not exercises_list:
             msg = {"en": "No exercises available.", "fr": "Aucun exercice disponible."}
             st.info(msg[self.lang])
             return
 
         menu_title = {"en": "Select a module:", "fr": "Sélectionnez un module :"}
-        col1, col2 = st.columns([0.8, 0.2], vertical_alignment="center")
+        st.markdown(f"### {menu_title[self.lang]}")
+
+        col1, col2, col3 = st.columns([1/5, 1/5, 1/5], vertical_alignment="center")
+
         with col1:
-            st.markdown(f"### {menu_title[self.lang]}")
-        with col2:
-            if self.controller.get_current_module_is_shuffled():
-                button_label = {"en": "Sort", "fr": "Trier"}
-            else:
-                button_label = {"en": "Shuffle", "fr": "Mélanger"}
-            if st.button(button_label[self.lang], key=f"module_btn_switch_shuffle_state", use_container_width=True):
-                self.controller.set_current_module_is_shuffled()
+            label = {"en": "Sort", "fr": "Trier"}
+            if st.button(label[self.lang], key=f"btn_sort", use_container_width=True, disabled=not shuffled):
+                self.controller.set_studyplan_shuffle_state(False)
+                if "seed" in st.query_params:
+                    self.controller.del_current_seed()
                 st.rerun()
-
-
+        with col2:
+            if shuffled:
+                st.markdown(f"**Seed:** `{seed}`", text_alignment="center")
+        with col3:
+            label = {"en": "Shuffle", "fr": "Mélanger"}
+            if st.button(label[self.lang], key=f"btn_shuffle", use_container_width=True):
+                new_seed = self.controller.get_new_seed()
+                self.controller.set_current_seed(new_seed)
+                self.controller.set_studyplan_shuffle_state(True)
+                st.rerun()
 
         for module_key, module_data in exercises_list.items():
             module_title = module_data["title"][self.lang]

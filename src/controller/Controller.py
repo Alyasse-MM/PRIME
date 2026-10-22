@@ -29,9 +29,6 @@ class Controller:
             
         if "current_module" not in st.session_state:
             st.session_state.current_module = None
-
-        if "current_module_is_shuffled" not in st.session_state:
-            st.session_state.current_module_is_shuffled = False
             
         if "current_exercise" not in st.session_state:
             st.session_state.current_exercise = None
@@ -93,7 +90,22 @@ class Controller:
             new_metadata (dict[str,dict,dict]): The key, names, and descriptions of the new selected module.
         """
         st.session_state.current_studyplan_metadata = new_metadata
-    
+
+    def get_current_seed(self) -> int:
+        try:
+            seed = int(st.query_params.get("seed", None))
+            if not (100000 <= seed <= 999999):
+                raise ValueError
+            return seed
+        except (TypeError, ValueError):
+            return None
+    def set_current_seed(self, new_seed:int):
+        st.query_params["seed"]=str(new_seed)
+    def del_current_seed(self):
+        del st.query_params["seed"]
+    def get_new_seed(self):
+        return st.session_state.current_studyplan.get_new_seed()
+
     def get_current_module(self) -> str:
         """
         Returns:
@@ -123,22 +135,18 @@ class Controller:
         """
         st.session_state.current_exercise = new_exercise
 
-    def get_current_module_is_shuffled(self):
-        return st.session_state.current_module_is_shuffled
-    def set_current_module_is_shuffled(self):
-        if st.session_state.current_module_is_shuffled:
-            st.session_state.current_module_is_shuffled = False
-            st.session_state.cached_exercises_list = st.session_state.current_studyplan.get_data()
-        else:
-            st.session_state.current_module_is_shuffled = True
-            st.session_state.cached_exercises_list = st.session_state.current_studyplan.get_randomized_data()
+    def get_studyplan_shuffle_state(self):
+        return st.query_params.get("shuffled","false").lower() == "true"
+    def set_studyplan_shuffle_state(self, new_state):
+        st.query_params["shuffled"] = str(new_state).lower()
 
-    def get_cached_exercises_list(self) -> dict:
+    def get_exercises_list(self) -> dict:
         """
         Returns:
             dict: the currently selected studyplan's dictionary of exercises grouped by module.
         """
-        return st.session_state.cached_exercises_list if st.session_state.cached_exercises_list else None
+        shuffled = st.query_params.get("shuffled","false")=="true"
+        return st.session_state.current_studyplan.get_randomized_data(self.get_current_seed()) if shuffled else st.session_state.current_studyplan.get_data()
 
     def switch_page_context(self, module_metadata: dict[str, str, str]):
         """
@@ -157,20 +165,18 @@ class Controller:
                 st.session_state.current_studyplan = None
                 self.set_current_studyplan_metadata(self.get_homepage_metadata())
                 st.session_state.cached_exercises_list = None
-                st.session_state.current_module_is_shuffled = False
             else:
                 st.session_state.app_state = State.STUDYPLAN
                 st.session_state.current_studyplan = StudyPlan.create(f"../exercises/{module_metadata["key"]}")
                 self.set_current_studyplan_metadata(module_metadata)
                 st.session_state.cached_exercises_list = st.session_state.current_studyplan.get_data()
-                st.session_state.current_module_is_shuffled = False
 
-    def get_modules_list(self) -> list[dict[str,str,str]]:
+    def get_studyplan_list(self) -> list[dict[str,str,str]]:
         study_plans = []
-        default_module_repertory = StudyPlan.get_checked_path(DEFAULT_STUDYPLAN_DIR)
-        for entry in default_module_repertory.rglob("**"):
+        default_studyplan_repertory = StudyPlan.get_checked_path(DEFAULT_STUDYPLAN_DIR)
+        for entry in default_studyplan_repertory.rglob("**"):
             if entry.is_dir():
-                module_key, module_names, module_descriptions, _ = StudyPlan.get_metadata(entry)
-                if module_key is not None and module_names is not None:
-                    study_plans.append({"key":module_key, "names":module_names, "descriptions":module_descriptions})
+                studyplan_key, studyplan_names, studyplan_descriptions, _ = StudyPlan.get_metadata(entry)
+                if studyplan_key is not None and studyplan_names is not None:
+                    study_plans.append({"key":studyplan_key, "names":studyplan_names, "descriptions":studyplan_descriptions})
         return study_plans
