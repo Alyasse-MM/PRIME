@@ -163,7 +163,7 @@ class StudyPlan:
 
     @st.cache_resource
     @staticmethod
-    def randomize_order(exercises_dict: dict, part_size=15) -> dict:
+    def randomize_order(exercises_dict: dict, seed=int, part_size=15) -> dict:
         """
         Randomizes the order of exercises in `exercises_dict` in a new dictionary. 
 
@@ -179,8 +179,8 @@ class StudyPlan:
         for module_data in exercises_dict.values():
             for exercise_class in module_data["exercises"]:
                 exercises_list.append((exercise_class))
-                
-        random.shuffle(exercises_list)
+
+        random.Random(seed).shuffle(exercises_list)
         
         randomized_dict = {}
         
@@ -205,5 +205,8 @@ class StudyPlan:
     def get_data(self) -> dict:
         return self.data
 
-    def get_randomized_data(self) -> dict:
-        return StudyPlan.randomize_order(self.data)
+    def get_randomized_data(self,seed:int) -> dict:
+        return StudyPlan.randomize_order(self.data,seed)
+
+    def get_new_seed(self) -> int:
+        return random.randint(100000,999999)
