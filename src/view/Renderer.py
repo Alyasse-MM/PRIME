@@ -138,13 +138,14 @@ class Renderer:
             st.query_params["shuffled"] = str(False).lower()
         seed = self.controller.get_current_seed()
         shuffled = self.controller.get_studyplan_shuffle_state()
-        if ("seed" in st.query_params and seed is None):
-            self.controller.del_current_seed()
-            st.rerun()
-        elif seed is None:
-            #self.controller.set_studyplan_shuffle_state(False)
+        batch_size = self.controller.get_current_batch_size()
+        if seed is None:
             self.controller.set_current_seed(self.controller.get_new_seed())
             st.rerun()
+        if not shuffled and "batch_size" in st.query_params:
+            self.controller.del_current_batch_size()
+        elif shuffled and batch_size is None:
+            self.controller.set_current_batch_size(self.controller.get_default_batch_size())
 
         display_title = self.controller.get_current_studyplan_names()[self.lang].capitalize()
         st.set_page_config(page_title=f"PRIME - {display_title}", layout="centered")

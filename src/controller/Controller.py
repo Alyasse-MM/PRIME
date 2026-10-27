@@ -106,6 +106,22 @@ class Controller:
     def get_new_seed(self) -> int:
         return st.session_state.current_studyplan.get_new_seed()
 
+
+    def get_current_batch_size(self) -> int:
+        try:
+            batchSize = int(st.query_params.get("batch_size", None))
+            if not (1 <= batchSize <= 100):
+                raise ValueError
+            return batchSize
+        except (TypeError, ValueError):
+            return None
+    def set_current_batch_size(self, new_batchSize:int):
+        st.query_params["batch_size"]=str(new_batchSize)
+    def del_current_batch_size(self):
+        del st.query_params["batch_size"]
+    def get_default_batch_size(self) -> int:
+        return StudyPlan.DEFAULT_BATCH_SIZE
+
     def get_current_module(self) -> str:
         """
         Returns:
@@ -146,7 +162,7 @@ class Controller:
             dict: the currently selected studyplan's dictionary of exercises grouped by module.
         """
         shuffled = st.query_params.get("shuffled","false")=="true"
-        return st.session_state.current_studyplan.get_randomized_data(self.get_current_seed()) if shuffled else st.session_state.current_studyplan.get_data()
+        return st.session_state.current_studyplan.get_randomized_data(self.get_current_seed(),self.get_current_batch_size()) if shuffled else st.session_state.current_studyplan.get_data()
 
     def switch_page_context(self, module_metadata: dict[str, str, str]):
         """
@@ -173,7 +189,7 @@ class Controller:
 
     def get_studyplan_list(self) -> list[dict[str,str,str]]:
         study_plans = []
-        default_studyplan_repertory = StudyPlan.get_checked_path(DEFAULT_STUDYPLAN_DIR)
+        default_studyplan_repertory = StudyPlan.get_checked_path(StudyPlan.DEFAULT_STUDYPLAN_DIR)
         for entry in default_studyplan_repertory.rglob("**"):
             if entry.is_dir():
                 studyplan_key, studyplan_names, studyplan_descriptions, _ = StudyPlan.get_metadata(entry)
