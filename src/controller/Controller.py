@@ -103,7 +103,7 @@ class Controller:
         st.query_params["seed"]=str(new_seed)
     def del_current_seed(self):
         del st.query_params["seed"]
-    def get_new_seed(self):
+    def get_new_seed(self) -> int:
         return st.session_state.current_studyplan.get_new_seed()
 
     def get_current_module(self) -> str:
