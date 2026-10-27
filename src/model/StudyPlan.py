@@ -8,9 +8,10 @@ import streamlit as st
 
 from exercises.base_exercise import BaseExercise
 
-DEFAULT_STUDYPLAN_DIR = Path("../exercises")
-
 class StudyPlan:
+    DEFAULT_STUDYPLAN_DIR = Path("../exercises")
+    DEFAULT_BATCH_SIZE = 15
+
     def __init__(self, paths, key: str, names: dict, descriptions: dict):
         self.paths = paths
         self.key = key
@@ -90,7 +91,7 @@ class StudyPlan:
         if (len(paths)>0):
             checked_paths=[]
             for element in paths:
-                checked_paths.append(cls.get_checked_path(DEFAULT_STUDYPLAN_DIR / element))
+                checked_paths.append(cls.get_checked_path(StudyPlan.DEFAULT_STUDYPLAN_DIR / element))
             return cls(checked_paths, key, names, descriptions)
         else:
             return cls(checked_path, key, names, descriptions)
@@ -163,7 +164,7 @@ class StudyPlan:
 
     @st.cache_resource
     @staticmethod
-    def randomize_order(exercises_dict: dict, seed=int, part_size=15) -> dict:
+    def randomize_order(exercises_dict: dict, seed=int, sBatch:int=None) -> dict:
         """
         Randomizes the order of exercises in `exercises_dict` in a new dictionary. 
 
@@ -175,6 +176,7 @@ class StudyPlan:
             data (dict): A dictionnary of `exercise_class` divided in
             `n` parts of size `part_size` maximum.
         """
+        batch_size = sBatch if sBatch is not None else DEFAULT_BATCH_SIZE
         exercises_list = []
         for module_data in exercises_dict.values():
             for exercise_class in module_data["exercises"]:
@@ -184,12 +186,12 @@ class StudyPlan:
         
         randomized_dict = {}
         
-        for i in range(0, len(exercises_list), part_size):
-            part_index = (i // part_size) + 1
+        for i in range(0, len(exercises_list), batch_size):
+            part_index = (i // batch_size) + 1
             titles={"en":f"Part {part_index}","fr":f"Partie {part_index}"}
             randomized_dict[f"Part {part_index}"] = {}
             randomized_dict[f"Part {part_index}"]["title"] = titles
-            randomized_dict[f"Part {part_index}"]["exercises"] = exercises_list[i : i + part_size]
+            randomized_dict[f"Part {part_index}"]["exercises"] = exercises_list[i : i + batch_size]
             
         return randomized_dict
 
@@ -205,8 +207,8 @@ class StudyPlan:
     def get_data(self) -> dict:
         return self.data
 
-    def get_randomized_data(self,seed:int) -> dict:
-        return StudyPlan.randomize_order(self.data,seed)
+    def get_randomized_data(self,seed:int,sBatch:int=None) -> dict:
+        return StudyPlan.randomize_order(self.data,seed,sBatch)
 
     def get_new_seed(self) -> int:
         return random.randint(100000,999999)
