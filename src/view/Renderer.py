@@ -138,11 +138,12 @@ class Renderer:
             st.query_params["shuffled"] = str(False).lower()
         seed = self.controller.get_current_seed()
         shuffled = self.controller.get_studyplan_shuffle_state()
-        if (not shuffled and seed is not None) or ("seed" in st.query_params and seed is None):
+        if ("seed" in st.query_params and seed is None):
             self.controller.del_current_seed()
             st.rerun()
-        elif shuffled and seed is None:
-            self.controller.set_studyplan_shuffle_state(False)
+        elif seed is None:
+            #self.controller.set_studyplan_shuffle_state(False)
+            self.controller.set_current_seed(self.controller.get_new_seed())
             st.rerun()
 
         display_title = self.controller.get_current_studyplan_names()[self.lang].capitalize()
@@ -164,8 +165,6 @@ class Renderer:
             label = {"en": "Sort", "fr": "Trier"}
             if st.button(label[self.lang], key=f"btn_sort", use_container_width=True, disabled=not shuffled):
                 self.controller.set_studyplan_shuffle_state(False)
-                if "seed" in st.query_params:
-                    self.controller.del_current_seed()
                 st.rerun()
         with col2:
             if shuffled:
