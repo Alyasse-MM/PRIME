@@ -8,11 +8,11 @@ class BaseExercise:
     title = {"fr": "", "en": ""}
     tags = []
 
-    def __init__(self, seed=None):
+    def __init__(self, seed:int=None):
         if seed is None:
             self.seed = random.randint(100000, 999999)
         else:
-            self.seed = int(seed)
+            self.seed = seed
 
         self.rng = random.Random(self.seed)
         
