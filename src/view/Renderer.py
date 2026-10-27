@@ -126,7 +126,7 @@ class Renderer:
             with col2:
                 btn_label = {"en": "Generate", "fr": "Générer"}
                 if st.button(btn_label[self.lang], key=f"btn_{ExerciseClass.id}"):
-                    self.controller.set_current_exercise(ExerciseClass())
+                    self.controller.set_current_exercise(ExerciseClass(self.controller.get_current_seed()))
                     self.controller.set_app_state(State.EXERCISE)
                     st.rerun()
 
