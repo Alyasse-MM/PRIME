@@ -322,6 +322,9 @@ class SolveQuadraticInequality(BaseExercise):
         
         # b) f(x) < mx + p
         r3, r4 = sorted(self.rng.sample([-3, -2, -1, 1, 2, 3, 4], k=2))
+        
+        while r3 == r1 and r4 == r2:
+            r3, r4 = sorted(self.rng.sample([-3, -2, -1, 1, 2, 3, 4], k=2))
         a2 = 1
         f_minus_g = sp.expand(a2 * (x - r3) * (x - r4))
         # Let's invent g(x) = 2x + 1, then f(x) = f_minus_g + g
