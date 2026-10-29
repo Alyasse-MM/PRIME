@@ -211,7 +211,7 @@ class FactorizeTrinomial(BaseExercise):
         eq1_expr = sp.expand(a1 * (x - r1) * (x - r2))
         
         # b) Delta = 0
-        r0 = self.rng.randint(-4, 4)
+        r0 = self.rng.choice([-4, -3, -2, -1, 1, 2, 3, 4])
         a2 = self.rng.choice([2, 3, 4])
         eq2_expr = sp.expand(a2 * (x - r0)**2)
 
