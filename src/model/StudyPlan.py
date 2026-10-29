@@ -111,7 +111,7 @@ class StudyPlan:
 
         exercises_dict = {}
 
-        for file_path in module_path.rglob("*.py"):
+        for file_path in sorted(module_path.rglob("*.py")):
             if file_path.name == "__init__.py":
                 continue
 
@@ -181,6 +181,8 @@ class StudyPlan:
         for module_data in exercises_dict.values():
             for exercise_class in module_data["exercises"]:
                 exercises_list.append((exercise_class))
+
+        exercises_list.sort(key=lambda x: x.__name__)
 
         random.Random(seed).shuffle(exercises_list)
         
