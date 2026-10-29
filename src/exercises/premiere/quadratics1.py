@@ -60,8 +60,8 @@ class DetermineCanonicalForm(BaseExercise):
         insight1_fr = [f"Identifiez les coefficients : $a={a}$, $b={b}$, $c={c}$. Calculez $\\alpha = -\\frac{{b}}{{2a}}$ et $\\beta = f(\\alpha)$."]
         insight1_en = [f"Identify the coefficients: $a={a}$, $b={b}$, $c={c}$. Calculate $\\alpha = -\\frac{{b}}{{2a}}$ and $\\beta = f(\\alpha)$."]
         
-        ans1_fr = [f"{canonical_tex}$ est la forme canonique de $f$."]
-        ans1_en = [f"{canonical_tex}$ is the canonical form of $f$."]
+        ans1_fr = [f"${canonical_tex}$ est la forme canonique de $f$."]
+        ans1_en = [f"${canonical_tex}$ is the canonical form of $f$."]
 
         self.questions.append(Question(q1_fr, q1_en, insight1_fr, insight1_en, ans1_fr, ans1_en))
 
